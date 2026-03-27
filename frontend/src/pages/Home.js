@@ -13,7 +13,7 @@ function Home() {
   const prevCount = useRef(0);
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyCUYfPEhgNXDNRKYDNaMtBmeJ9hUj-H2EI",
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
   });
 
   // 🔄 Fetch accidents
