@@ -2,6 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
+require("dotenv").config();
 
 // ==================== Firebase Setup ====================
 const admin = require("firebase-admin");
@@ -19,7 +20,7 @@ app.use(cors());
 app.use(express.json());
 
 // ==================== Fast2SMS ====================
-const FAST2SMS_API_KEY = "Na4X2WGcQ2mHPZpahaW4cgzJfBArtdFbKR23oBhKTtKzsC1WbQU3Bn8NPXVW";
+const FAST2SMS_API_KEY = process.env.FAST2SMS_API_KEY;
 
 // ==================== Send SMS ====================
 async function sendAlert(contact, msg) {
@@ -87,27 +88,17 @@ app.post("/api/accident", async (req, res) => {
 
     const severity = calculateSeverity(speed);
 
-    let accidentRef;
-
-try {
-  accidentRef = await db.collection("accidents").add({
-    latitude,
-    longitude,
-    severity,
-    responded: false,
-    police_responded: false,
-    hospital_responded: false,
-    timestamp: admin.firestore.FieldValue.serverTimestamp(),
-    alert_sent_at: null,
-    responded_at: null,
-  });
-
-  console.log("✅ Stored in Firestore:", accidentRef.id);
-
-} catch (error) {
-  console.error("❌ Firestore Error:", error);
-  return res.status(500).json({ error: "Firestore failed" });
-}
+    const accidentRef = await db.collection("accidents").add({
+      latitude,
+      longitude,
+      severity,
+      responded: false,
+      police_responded: false,
+      hospital_responded: false,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      alert_sent_at: null,
+      responded_at: null,
+    });
 
     // ---------- Find nearest contacts ----------
     const contactsSnap = await db.collection("emergency_contacts").get();
